@@ -8,6 +8,8 @@
 body {
     display: flex;
     justify-content: center;
+    align-content: center;
+    height: 100vh;
 }
 
 .container {
@@ -15,7 +17,7 @@ body {
     flex-direction: column;
     justify-content: center;
     width: min-content;
-    height: 100vh;
+    zoom:2;
 }
 
 label,
