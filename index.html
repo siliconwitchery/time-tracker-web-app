@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Project Time Tracker | Silicon Witchery</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-database.js"></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <label for="txtEmail">Login</label>
+        <input id="txtEmail" type="email" placeholder="Email">
+        <input id="txtPassword" , type="password" , placeholder="Password">
+
+        <label for="selProject">Project</label>
+        <select id="selProject">
+            <option value="aipd">AI - PD</option>
+            <option value="sws1">SW - S1</option>
+            <option value="ea">E - A</option>
+            <option value="sws1pop">S1 - POP</option>
+            <option value="ehmx">EH - MX</option>
+        </select>
+
+        <label for="txtTime">Time spent</label>
+        <input id="txtTime" type="time" placeholder="HH:MM">
+
+        <label for="txtDate">On date</label>
+        <input id="txtDate" type="date" placeholder="On yyyy-mm-dd">
+        <input id="txtDesc" type="text" placeholder="Note/Description">
+
+        <button id="btnSubmit" class="btn">Submit</button>
+
+        <script src="app.js"></script>
+
+    </div>
+</body>
+
+</html>
