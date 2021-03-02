@@ -1,6 +1,6 @@
 (function () {
 
-    // Initialise firebase
+    // Initialize firebase
     const config = {
         apiKey: "AIzaSyDSFkooFFKBC0iKzSd8cBfe3bv5jWUxZYc",
         authDomain: "time-sheet-5d26c.firebaseapp.com",
@@ -14,80 +14,113 @@
     firebase.initializeApp(config);
 
 
-    // Login flag
-    var loggedIn = false;
-
-
     // Get elements 
     const txtEmail = document.getElementById('txtEmail');
     const txtPassword = document.getElementById('txtPassword');
-    const selProject = document.getElementById('selProject');
-    const txtTime = document.getElementById('txtTime');
-    const txtDate = document.getElementById('txtDate');
+    var selProject = document.getElementById('selProject');
+    var txtTime = document.getElementById('txtTime');
+    var txtDate = document.getElementById('txtDate');
     const txtDesc = document.getElementById('txtDesc');
     const btnSubmit = document.getElementById('btnSubmit');
 
 
+    // Set default time
+    document.getElementById('txtTime').value = "1:00";
+
+
+    // Set default date
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    document.getElementById('txtDate').value = yyyy + '-' + mm + '-' + dd;
+
+
+    // Variable to check state
+    var loggedIn = false;
+
+
     // Submit button event listener
     btnSubmit.addEventListener('click', e => {
-        
-        if (loggedIn == false) {
-            // Get email and password
-            const email = txtEmail.value;
-            const pass = txtPassword.value;
 
-            // const promise = firebase.auth()
-            //                 .signInWithEmailAndPassword(email, pass);
-            // promise.catch(function (error) {
-               
-            // });
+        // Format the user name ready for login or form submission
+        const user = txtEmail.value
+            .substring(0, txtEmail.value.lastIndexOf("@"))
+            .toLowerCase();
+
+        // If not logged in, log in and get the list of projects
+        if (loggedIn == false) {
 
             // Sign in
-            firebase.auth().signInWithEmailAndPassword(email, pass)
-            .then(function(firebaseUser) {
-                document.getElementById('btnSubmit').innerHTML = "Sure?";
-                loggedIn = true;
-                
-            })
-            .catch(function(error) {
-                console.log(error.message);
-                document.getElementById('btnSubmit').innerHTML = "Bad user/pass";
-            });
+            firebase.auth()
+                .signInWithEmailAndPassword(txtEmail.value, txtPassword.value)
 
-        } else {
-            
-            // Format data to send
-            console.log('Sending data');
-            const user = txtEmail.value
-                .substring(0, txtEmail.value.lastIndexOf("@"))
-                .toLowerCase();
-            const project = selProject.value;
-            const date = txtDate.value;
+                // If successful
+                .then(function (firebaseUser) {
+
+                    // Get project list
+                    var userRef = firebase.database().ref(user);
+                    userRef.once("value", function (snapshot) {
+                        snapshot.forEach(function (child) {
+
+                            // Update selection menu
+                            var newOption = document.createElement("option");
+                            newOption.value = child.key.toString();
+                            newOption.text = child.key.toString();
+                            selProject.add(newOption);
+                        });
+                    });
+
+                    // Mark as logged in, then next click will submit the form
+                    loggedIn = true;
+                    document.getElementById('btnSubmit').innerHTML = "Submit?";
+                })
+
+                // Otherwise
+                .catch(function (error) {
+                    console.error(error.message);
+                    document.getElementById('btnSubmit')
+                        .innerHTML = "Bad user/password";
+                });
+
+        } else /* Once logged in, and user clicks again */ {
+
 
             // Send data
-            firebase.database().ref(user).child(project).child(date).set({
-                time: txtTime.value,
-                note: txtDesc.value
-            });
+            firebase.database().ref(user)
+                .child(selProject.value)
+                .child(txtDate.value)
+                .set({
+                    time: txtTime.value,
+                    note: txtDesc.value
+                });
 
             // Log out
-            const promise = firebase.auth().signOut();
-            promise.catch(e => console.log(e.message));
-            loggedIn = false;
-            document.getElementById('btnSubmit').innerHTML = "Done";
+            firebase.auth().signOut()
+
+                // If okay
+                .then(function () {
+
+                    // Clear flag
+                    loggedIn = false;
+                    document.getElementById('btnSubmit')
+                        .innerHTML = "Done. Logged out";
+
+                    // Clear dropdown list
+                    var length = selProject.options.length;
+                    for (i = length - 1; i >= 0; i--) {
+                        selProject.options[i] = null;
+                    }
+                })
+
+                // Otherwise
+                .catch(function (error) {
+
+                    // Or some logout error
+                    console.error(error.message);
+                    document.getElementById('btnSubmit')
+                        .innerHTML = "Logout error";
+                });
         }
     })
-
-
-    // Realtime auth listener
-    firebase.auth().onAuthStateChanged(firebaseUser => {
-
-        if (firebaseUser) {
-            console.log('Authenticated callback');
-
-        } else {
-            console.log('Not logged in callback');
-        }
-    })
-
 }());
