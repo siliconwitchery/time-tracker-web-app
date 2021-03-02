@@ -22,10 +22,11 @@
     var txtDate = document.getElementById('txtDate');
     const txtDesc = document.getElementById('txtDesc');
     const btnSubmit = document.getElementById('btnSubmit');
+    const btnReport = document.getElementById('btnReport');
 
 
     // Set default time
-    document.getElementById('txtTime').value = "1:00";
+    document.getElementById('txtTime').value = "01:00";
 
 
     // Set default date
@@ -43,11 +44,6 @@
     // Submit button event listener
     btnSubmit.addEventListener('click', e => {
 
-        // Format the user name ready for login or form submission
-        const user = txtEmail.value
-            .substring(0, txtEmail.value.lastIndexOf("@"))
-            .toLowerCase();
-
         // If not logged in, log in and get the list of projects
         if (loggedIn == false) {
 
@@ -59,8 +55,8 @@
                 .then(function (firebaseUser) {
 
                     // Get project list
-                    var userRef = firebase.database().ref(user);
-                    userRef.once("value", function (snapshot) {
+                    var projRef = firebase.database().ref('active-projects/');
+                    projRef.once("value", function (snapshot) {
                         snapshot.forEach(function (child) {
 
                             // Update selection menu
@@ -85,6 +81,10 @@
 
         } else /* Once logged in, and user clicks again */ {
 
+            // Format user name for database entry
+            const user = txtEmail.value
+                .substring(0, txtEmail.value.lastIndexOf("@"))
+                .toLowerCase();
 
             // Send data
             firebase.database().ref(user)

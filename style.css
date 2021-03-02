@@ -3,6 +3,7 @@
 * {
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
+    font-size: 1rem;
 }
 
 body {
@@ -17,7 +18,7 @@ body {
     flex-direction: column;
     justify-content: center;
     width: min-content;
-    zoom:2;
+    /* zoom:2; */
 }
 
 label,
