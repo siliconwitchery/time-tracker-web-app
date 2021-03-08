@@ -24,6 +24,7 @@
     const txtEmail = document.getElementById('txtEmail');
     const txtPassword = document.getElementById('txtPassword');
     var selProject = document.getElementById('selProject');
+    var selStaff = document.getElementById('selStaff');
     var txtTime = document.getElementById('txtTime');
     var txtDate = document.getElementById('txtDate');
     const txtDesc = document.getElementById('txtDesc');
@@ -38,7 +39,7 @@
     // Set default date
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
     var yyyy = today.getFullYear();
     document.getElementById('txtDate').value = yyyy + '-' + mm + '-' + dd;
 
@@ -73,6 +74,25 @@
                         });
                     });
 
+                    // Get staff list
+                    var staffRef = firebase.database().ref('active-staff/');
+                    staffRef.once("value", function (snapshot) {
+                        snapshot.forEach(function (child) {
+
+                            // Update selection menu
+                            var newOption = document.createElement("option");
+                            newOption.value = child.key.toString();
+                            newOption.text = child.key.toString();
+                            selStaff.add(newOption);
+
+                            // Preselect the logged in user
+                            if (txtEmail.value == child.val())
+                            {
+                                selStaff.value = child.key;
+                            }
+                        });
+                    });
+
                     // Mark as logged in, then next click will submit the form
                     loggedIn = true;
                     document.getElementById('btnSubmit').innerHTML = "Submit?";
@@ -87,13 +107,8 @@
 
         } else /* Once logged in, and user clicks again */ {
 
-            // Format user name for database entry
-            const user = txtEmail.value
-                .substring(0, txtEmail.value.lastIndexOf("@"))
-                .toLowerCase();
-
             // Send data
-            firebase.database().ref(user)
+            firebase.database().ref(selStaff.value)
                 .child(selProject.value)
                 .child(txtDate.value)
                 .set({
@@ -112,10 +127,13 @@
                     document.getElementById('btnSubmit')
                         .innerHTML = "Done. Logged out";
 
-                    // Clear dropdown list
-                    var length = selProject.options.length;
-                    for (i = length - 1; i >= 0; i--) {
+                    // Clear dropdown lists
+                    for (i = selProject.options.length - 1; i >= 0; i--) {
                         selProject.options[i] = null;
+                    }
+
+                    for (i = selStaff.options.length - 1; i >= 0; i--) {
+                        selStaff.options[i] = null;
                     }
                 })
 
