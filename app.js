@@ -4,8 +4,8 @@
     let vh = window.innerHeight * 0.01;
     // Then we set the value in the --vh custom property to the root of the document
     document.documentElement.style.setProperty('--vh', `${vh}px`);
-    
-    
+
+
     // Initialize firebase
     const config = {
         apiKey: "AIzaSyDSFkooFFKBC0iKzSd8cBfe3bv5jWUxZYc",
@@ -86,8 +86,7 @@
                             selStaff.add(newOption);
 
                             // Preselect the logged in user
-                            if (txtEmail.value == child.val())
-                            {
+                            if (txtEmail.value == child.val()) {
                                 selStaff.value = child.key;
                             }
                         });
@@ -96,6 +95,9 @@
                     // Mark as logged in, then next click will submit the form
                     loggedIn = true;
                     document.getElementById('btnSubmit').innerHTML = "Submit?";
+
+                    // Enable the report button
+                    document.getElementById('btnReport').disabled = false;
                 })
 
                 // Otherwise
@@ -135,6 +137,9 @@
                     for (i = selStaff.options.length - 1; i >= 0; i--) {
                         selStaff.options[i] = null;
                     }
+
+                    // Disable the report button
+                    document.getElementById('btnReport').disabled = true;
                 })
 
                 // Otherwise
@@ -146,5 +151,30 @@
                         .innerHTML = "Logout error";
                 });
         }
+    });
+
+
+    // Report button event listener
+    btnReport.addEventListener('click', e => {
+
+        // For all staff
+        var staffRef = firebase.database().ref('active-staff/');
+        staffRef.once("value", function (staffSnapshot) {
+            staffSnapshot.forEach(function (staff) {
+
+                // For all projects
+                var projRef = firebase.database().ref('active-projects/');
+                projRef.once("value", function (projectSnapshot) {
+                    projectSnapshot.forEach(function (project) {
+
+                        console.log(staff.key, "on", project.key);
+
+                        // For all dates
+
+                    });
+                });
+            });
+        });
     })
+
 }());
