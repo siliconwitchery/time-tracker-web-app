@@ -19,7 +19,8 @@
 </head>
 
 <body>
-    <div class="container">
+
+    <div id="divInterface">
 
         <label for="txtEmail">Login</label>
         <input id="txtEmail" type="email" placeholder="Email">
@@ -34,16 +35,34 @@
         <label for="txtTime">Time spent</label>
         <input id="txtTime" type="time" placeholder="HH:MM">
 
-        <label for="txtDate">On date</label>
+        <label for="txtDate">On date / Report month</label>
         <input id="txtDate" type="date" placeholder="On yyyy-mm-dd">
         <input id="txtDesc" type="text" placeholder="Note/Description">
 
         <button id="btnSubmit" class="btn">Login</button>
         <button id="btnReport" class="btn" disabled>Show Report</button>
 
-        <script src="app.js"></script>
-
     </div>
+
+    <div id="divReport" style="display: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th class="tb">Staff</th>
+                    <th class="tb">Project</th>
+                    <th class="tb">Hours</th>
+                    <th class="tb">Date</th>
+                    <th class="tb">Note</th>
+                </tr>
+            </thead>
+
+            <tbody id="tblReport">
+            </tbody>
+
+        </table>
+        <script src="app.js"></script>
+    </div>
+
 </body>
 
 </html>
