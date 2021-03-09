@@ -12,10 +12,10 @@ body {
     align-content: center;
     height: 100vh; /* Fallback for browsers that do not support Custom Properties */
     height: calc(var(--vh, 1vh) * 100);
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
-.container {
+#divInterface {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -31,4 +31,22 @@ button {
 select,
 input {
     margin-top: 0.3rem;
+}
+
+table {
+    margin-top: 1rem;
+    border-collapse: collapse;
+}
+
+td,
+th {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    text-align: left;
+    line-height: 1rem;
+}
+
+.tb {
+    border-bottom: 1px solid #cccccc;
+    font-weight: 600;
 }

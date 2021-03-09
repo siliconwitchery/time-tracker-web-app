@@ -4,8 +4,8 @@
     let vh = window.innerHeight * 0.01;
     // Then we set the value in the --vh custom property to the root of the document
     document.documentElement.style.setProperty('--vh', `${vh}px`);
-    
-    
+
+
     // Initialize firebase
     const config = {
         apiKey: "AIzaSyDSFkooFFKBC0iKzSd8cBfe3bv5jWUxZYc",
@@ -30,7 +30,9 @@
     const txtDesc = document.getElementById('txtDesc');
     const btnSubmit = document.getElementById('btnSubmit');
     const btnReport = document.getElementById('btnReport');
-
+    const tblReport = document.getElementById('tblReport');
+    const divInterface = document.getElementById('divInterface');
+    const divReport = document.getElementById('divReport');
 
     // Set default time
     document.getElementById('txtTime').value = "01:00";
@@ -86,8 +88,7 @@
                             selStaff.add(newOption);
 
                             // Preselect the logged in user
-                            if (txtEmail.value == child.val())
-                            {
+                            if (txtEmail.value == child.val()) {
                                 selStaff.value = child.key;
                             }
                         });
@@ -96,6 +97,9 @@
                     // Mark as logged in, then next click will submit the form
                     loggedIn = true;
                     document.getElementById('btnSubmit').innerHTML = "Submit?";
+
+                    // Enable the report button
+                    document.getElementById('btnReport').disabled = false;
                 })
 
                 // Otherwise
@@ -135,6 +139,9 @@
                     for (i = selStaff.options.length - 1; i >= 0; i--) {
                         selStaff.options[i] = null;
                     }
+
+                    // Disable the report button
+                    document.getElementById('btnReport').disabled = true;
                 })
 
                 // Otherwise
@@ -146,5 +153,77 @@
                         .innerHTML = "Logout error";
                 });
         }
+    });
+
+
+    // Report button event listener
+    btnReport.addEventListener('click', e => {
+
+        // Hide interface and show the report table
+        divInterface.style.display = 'none';
+        divReport.style.display = 'block';
+
+        // For all staff
+        var staffRef = firebase.database().ref('active-staff/');
+        staffRef.once("value", function (staffSnapshot) {
+            staffSnapshot.forEach(function (staff) {
+
+                // For all projects
+                var projRef = firebase.database().ref('active-projects/');
+                projRef.once("value", function (projectSnapshot) {
+                    projectSnapshot.forEach(function (project) {
+
+                        // Variable to sum hours on this project
+                        let totalMins = 0;
+
+                        // For all dates
+                        var dateRef = firebase.database()
+                            .ref(staff.key + '/' + project.key);
+                        dateRef.once("value", function (dateSnapshot) {
+                            dateSnapshot.forEach(function (date) {
+
+                                // Show only for the selected month
+                                if (date.key.substr(0, 7) ==
+                                    txtDate.value.substr(0, 7)) {
+
+                                    // Populate table data
+                                    tblReport.innerHTML +=
+                                        `<tr>
+                                            <td>${staff.key}</td>
+                                            <td>${project.key}</td>
+                                            <td>${date.val()['time']}</td>
+                                            <td>${date.key}</td>
+                                            <td>${date.val()['note']}</td>
+                                         </tr>`;
+
+                                    // Keep a running total of mins
+                                    var t = date.val()['time'].split(':');
+                                    totalMins += +t[0] * 60 + +t[1];
+                                }
+                            });
+
+                            // Write total time
+                            if (totalMins > 0) {
+
+                                // Convert mins to HH:mm
+                                function z(n) {
+                                    return (n < 10 ? '0' : '') + n;
+                                }
+                                var h = (totalMins / 60 | 0);
+                                var m = totalMins % 60;
+
+                                tblReport.innerHTML +=
+                                    `<tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="tb">${z(h) + ':' + z(m)}</td>
+                                     </tr>`;
+                            }
+                        });
+                    });
+                });
+            });
+        });
     })
+
 }());
